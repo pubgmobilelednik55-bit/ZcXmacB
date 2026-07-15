@@ -1,261 +1,211 @@
 const express = require('express');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
 const TelegramBot = require('node-telegram-bot-api');
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const path = require('path');
 
 const app = express();
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-const PORT = process.env.PORT || 5000;
-const BOT_TOKEN = '8967240691:AAGsYKLNxDoync5ujOA_j2t__f1v6OYlj-o';
-const ADMIN_ID = '8655609546'; // Admin paneli faqat ushbu ID uchun ochiq
+// PAPKASIZ TUZILMA: index.html va boshqa statik fayllarni to'g'ridan-to'g'ri rootdan xizmat qildirish
+app.use(express.static(__dirname));
 
-const bot = new TelegramBot(BOT_TOKEN, { polling: true });
-const DB_FILE = path.join(__dirname, 'database.json');
+const PORT = process.env.PORT || 3000;
+const SERVER_URL = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
 
-// Ma'lumotlarni xavfsiz o'qish (Fayl buzilishi yoki bo'sh bo'lib qolishidan himoyalangan)
-function readDB() {
-    try {
-        if (!fs.existsSync(DB_FILE)) {
-            const initialData = { users: {}, orders: [] };
-            fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2), 'utf-8');
-            return initialData;
-        }
-        const data = fs.readFileSync(DB_FILE, 'utf-8');
-        if (!data || data.trim() === "") {
-            return { users: {}, orders: [] };
-        }
-        return JSON.parse(data);
-    } catch (e) {
-        console.error("Bazani o'qishda xatolik yuz berdi:", e);
-        return { users: {}, orders: [] };
+// Asosiy Bot Sozlamalari
+const MAIN_BOT_TOKEN = "8843518157:AAFJO2e3ifQpodfslZT9WCouzsnpV_ZgNeE";
+const ADMIN_ID = 8683151446;
+const CARD_NUMBER = "4916990355543858";
+
+const bot = new TelegramBot(MAIN_BOT_TOKEN, { polling: true });
+
+// Ma'lumotlar bazasi (Xotirada saqlanadi)
+const db = {
+    users: {},
+    bots: [],
+    system: {
+        isMaintenance: false,
+        createdBotsCount: 0
     }
-}
+};
 
-// Ma'lumotlarni ishonchli (atomic) yozish (Balanslar o'chib ketishining oldini oladi)
-function writeDB(data) {
-    try {
-        const tempPath = DB_FILE + '.tmp';
-        fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), 'utf-8');
-        fs.renameSync(tempPath, DB_FILE); // Faylni to'liq yozib bo'lgach asliga almashtiradi
-    } catch (e) {
-        console.error("Bazaga yozishda xatolik yuz berdi:", e);
-    }
-}
+// BOT SHABLONLARI HOZIRCHA 0 TA (UMUMAN YO'Q) - ADMIN O'ZI PANELDAN QO'SHADI
+let botTemplates = [];
 
-app.use(express.static(path.join(__dirname)));
-
+// Asosiy sahifani (index.html) foydalanuvchiga yuborish
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Bot /start bosilganda (Foydalanuvchini kutib olish)
-bot.onText(/\/start/, (msg) => {
+// Botga /start bosilganda foydalanuvchini bazaga qo'shish va Mini App tugmasini yuborish
+bot.onText(/\/start(?:\s+(.+))?/, (msg, match) => {
     const chatId = msg.chat.id;
-    const username = msg.from.username || '';
-    const firstName = msg.from.first_name || '';
+    const username = msg.from.username ? `@${msg.from.username}` : `ID: ${chatId}`;
+    const refId = match ? match[1] : null;
 
-    const db = readDB();
-    if (!db.users[msg.from.id]) {
-        db.users[msg.from.id] = {
-            id: msg.from.id,
-            username: username.toLowerCase(),
-            first_name: firstName,
+    if (!db.users[chatId]) {
+        db.users[chatId] = {
+            id: chatId,
+            username: username,
             balance: 0,
-            isBanned: false
+            deposited: 0,
+            referrals: 0,
+            createdBots: [],
+            regOrder: Object.keys(db.users).length + 1
         };
-        writeDB(db);
+
+        // Referal tizimi (Taklif qilgunga 1000 so'm)
+        if (refId && db.users[refId] && parseInt(refId) !== chatId) {
+            db.users[refId].balance += 1000;
+            db.users[refId].referrals += 1;
+            bot.sendMessage(refId, `🎉 Do'stingiz ro'yxatdan o'tdi! Balansingizga 1,000 so'm qo'shildi.`);
+        }
     }
 
-    const welcomeMessage = `👋 Xush kelibsiz, ${firstName} \n\nBizni xizmatlarimizdan foydalaning, vaqtingizni va pulingizni tejang. Rivojlanish vaqti keldi!\n\n✨ Biz bilan juda qulay!\n\n🙏 Bizning xizmatlarimizdan foydalanganingiz uchun rahmat!`;
+    const webAppUrl = `${SERVER_URL}/index.html?userId=${chatId}`;
 
-    bot.sendMessage(chatId, welcomeMessage, {
+    bot.sendMessage(chatId, `Salom 👋\n**@ZcMekerBot** konstruktoriga xush kelibsiz!\n\nPastdagi tugmani bosib ilovani oching va o'zingizga qulay botlarni yarating.`, {
+        parse_mode: "Markdown",
         reply_markup: {
             inline_keyboard: [
                 [
-                    {
-                        text: "🚀 Ilovani ochish",
-                        web_app: { url: `https://SAYTINGIZ_LINKI.com` } // DeploY qilingach shu yerga sayt linki qo'yiladi
-                    }
-                ],
-                [
-                    {
-                        text: "📢 News Kanalimiz",
-                        url: "https://t.me/ZcPinNews"
-                    }
+                    { text: "📱 Ilovani ochish", web_app: { url: webAppUrl } }
                 ]
             ]
         }
     });
 });
 
-// Foydalanuvchini Mini App bilan sinxronlash
-app.post('/api/user/sync', (req, res) => {
-    const { id, username, first_name } = req.body;
-    if (!id) return res.status(400).json({ error: 'ID talab qilinadi' });
-
-    const db = readDB();
-    const cleanUsername = (username || '').toLowerCase();
-
-    if (!db.users[id]) {
-        db.users[id] = {
-            id: id,
-            username: cleanUsername,
-            first_name: first_name || 'Foydalanuvchi',
-            balance: 0,
-            isBanned: false
-        };
-    } else {
-        db.users[id].username = cleanUsername;
-        db.users[id].first_name = first_name || db.users[id].first_name;
+// Foydalanuvchi ma'lumotlarini Mini App'ga yuborish API'si
+app.get('/api/user/:id', (req, res) => {
+    const userId = req.params.id;
+    let user = db.users[userId];
+    if (!user) {
+        user = { id: userId, username: "Foydalanuvchi", balance: 0, deposited: 0, referrals: 0, createdBots: [], regOrder: 999 };
     }
-    
-    writeDB(db);
-    res.json(db.users[id]);
+    res.json({ user, system: db.system, templates: botTemplates, card: CARD_NUMBER });
 });
 
-// Buyurtma yaratish API
-app.post('/api/order', (req, res) => {
-    const { userId, game, item, price, playerId } = req.body;
-    const db = readDB();
+// Dinamik Webhook bilan yangi bot yaratish API'si
+app.post('/api/create-bot', async (req, res) => {
+    const { userId, templateId, token, botAdminId } = req.body;
     const user = db.users[userId];
+    const template = botTemplates.find(t => t.id === templateId);
 
-    if (!user) return res.status(404).json({ error: 'Foydalanuvchi topilmadi' });
-    if (user.isBanned) return res.status(403).json({ error: 'Siz bloklangansiz!' });
-    if (user.balance < price) return res.status(400).json({ error: 'Balansda mablag\' yetarli emas!' });
-
-    user.balance -= price;
-
-    const orderId = Math.floor(1000 + Math.random() * 9000); // 4 xonali buyurtma ID si
-
-    const newOrder = {
-        id: orderId,
-        userId: userId,
-        username: user.username,
-        game: game,
-        item: item,
-        price: price,
-        playerId: playerId || 'Kiritilmagan',
-        status: 'Kutilmoqda',
-        date: new Date().toLocaleString()
-    };
-
-    db.orders.push(newOrder);
-    writeDB(db);
-
-    // Adminga xabar berish
-    const adminMsg = `🚨 YANGI BUYURTMA!\n\n👤 Foydalanuvchi: @${user.username || 'yo\'q'} (ID: ${userId})\n🎮 O'yin: ${game}\n📦 Maxsulot: ${item}\n🆔 Player ID: ${playerId}\n💰 Narxi: ${price.toLocaleString()} so'm\n🔢 Buyurtma ID: #${newOrder.id}`;
-    bot.sendMessage(ADMIN_ID, adminMsg);
-
-    res.json({ success: true, orderId: newOrder.id, balance: user.balance });
-});
-
-// Foydalanuvchining o'z buyurtmalarini olish
-app.get('/api/orders/:userId', (req, res) => {
-    const { userId } = req.params;
-    const db = readDB();
-    const userOrders = db.orders.filter(o => String(o.userId) === String(userId));
-    res.json(userOrders);
-});
-
-// Admin panel uchun barcha buyurtmalar ro'yxati
-app.get('/api/admin/orders', (req, res) => {
-    const db = readDB();
-    res.json(db.orders);
-});
-
-// Admin: Buyurtma holatini o'zgartirish (Bajarildi / Rad etildi)
-app.post('/api/admin/order/status', (req, res) => {
-    const { orderId, status } = req.body;
-    const db = readDB();
-    const orderIndex = db.orders.findIndex(o => o.id === parseInt(orderId));
-
-    if (orderIndex === -1) return res.status(404).json({ error: 'Buyurtma topilmadi' });
-
-    const order = db.orders[orderIndex];
-    if (order.status !== 'Kutilmoqda') {
-        return res.status(400).json({ error: 'Bu buyurtma allaqachon bajarilgan' });
+    if (!user || !template) {
+        return res.status(400).json({ error: "Xatolik: Shablon mavjud emas yoki ma'lumotlar yetarsiz!" });
     }
 
-    order.status = status;
-    const user = db.users[order.userId];
-
-    if (status === 'Bajarildi') {
-        if (user) {
-            bot.sendMessage(order.userId, `Buyurtma bajarildi ✔️\n\n🎮 O'yin: ${order.game}\n📦 Maxsulot: ${order.item}\n🆔 Player ID: ${order.playerId}\n🔢 Buyurtma ID: #${order.id}`);
-        }
-    } else if (status === 'Rad etildi') {
-        if (user) {
-            user.balance += order.price;
-            bot.sendMessage(order.userId, `❌ Buyurtmangiz rad etildi va mablag' balansingizga qaytarildi.\n🔢 Buyurtma ID: #${order.id}`);
-        }
+    if (user.balance < template.price) {
+        return res.status(400).json({ error: "Hisobingizda yetarli mablag' mavjud emas!" });
     }
 
-    writeDB(db);
-    res.json({ success: true, orders: db.orders });
+    try {
+        const tempBot = new TelegramBot(token);
+        const botInfo = await tempBot.getMe();
+        
+        const webhookUrl = `${SERVER_URL}/bot-webhook/${token}`;
+        await tempBot.setWebHook(webhookUrl);
+
+        user.balance -= template.price;
+        const newBot = {
+            id: botInfo.id,
+            username: `@${botInfo.username}`,
+            name: template.name,
+            token: token,
+            botAdminId: botAdminId,
+            ownerId: userId,
+            status: "active"
+        };
+
+        user.createdBots.push(newBot);
+        db.bots.push(newBot);
+        db.system.createdBotsCount += 1;
+
+        res.json({ success: true, bot: newBot, userBalance: user.balance });
+    } catch (err) {
+        res.status(400).json({ error: "Token noto'g'ri yoki faol emas! Qayta urinib ko'ring." });
+    }
 });
 
-// Admin: Statistika API (Nolga tushmaydigan dinamik hisob-kitob)
-app.get('/api/admin/stats', (req, res) => {
-    const db = readDB();
-    const totalUsers = Object.keys(db.users).length;
-    const totalOrders = db.orders.length;
-    res.json({ totalUsers, totalOrders });
+// Yaratilgan botlarning webhook xabarlarini boshqarish
+app.post('/bot-webhook/:token', (req, res) => {
+    const token = req.params.token;
+    const update = req.body;
+    res.sendStatus(200);
+
+    const targetBot = db.bots.find(b => b.token === token);
+    if (targetBot && update.message) {
+        const tempBot = new TelegramBot(token);
+        const chatId = update.message.chat.id;
+        const text = update.message.text;
+
+        if (text === "/start") {
+            tempBot.sendMessage(chatId, `Assalomu alaykum! Ushbu bot **@ZcMekerBot** konstruktori orqali muvaffaqiyatli ishga tushirildi.`, { parse_mode: "Markdown" });
+        }
+    }
 });
 
-// Admin: Foydalanuvchi balansini boshqarish
-app.post('/api/admin/balance', (req, res) => {
-    const { username, amount, action } = req.body;
-    const db = readDB();
-    const cleanUsername = username.replace('@', '').toLowerCase();
-    const userKey = Object.keys(db.users).find(key => db.users[key].username === cleanUsername);
+// --- ADMIN API SOZLAMALARI ---
 
-    if (!userKey) return res.status(404).json({ error: 'Foydalanuvchi topilmadi' });
+// Foydalanuvchi balansini boshqarish (Qo'shish/Ayirish)
+app.post('/api/admin/change-balance', (req, res) => {
+    const { adminId, targetUserId, amount, action } = req.body;
+    if (parseInt(adminId) !== ADMIN_ID) return res.status(403).json({ error: "Ruxsat etilmadi!" });
 
-    const value = parseInt(amount);
-    if (action === 'add') {
-        db.users[userKey].balance += value;
-        bot.sendMessage(userKey, `💰 Hisobingizga ${value.toLocaleString()} so'm qo'shildi! Balans: ${db.users[userKey].balance.toLocaleString()} so'm.`);
+    const user = db.users[targetUserId];
+    if (!user) return res.status(404).json({ error: "Foydalanuvchi topilmadi!" });
+
+    if (action === "add") {
+        user.balance += parseFloat(amount);
+        user.deposited += parseFloat(amount);
+        bot.sendMessage(targetUserId, `💰 Hisobingiz admin tomonidan **${parseFloat(amount).toLocaleString()} so'm**ga to'ldirildi!`, { parse_mode: "Markdown" });
     } else {
-        db.users[userKey].balance = Math.max(0, db.users[userKey].balance - value);
-        bot.sendMessage(userKey, `📉 Hisobingizdan ${value.toLocaleString()} so'm ayirildi. Balans: ${db.users[userKey].balance.toLocaleString()} so'm.`);
+        user.balance = Math.max(0, user.balance - parseFloat(amount));
     }
-
-    writeDB(db);
-    res.json({ success: true, user: db.users[userKey] });
+    res.json({ success: true, user });
 });
 
-// Admin: Foydalanuvchini ban qilish
-app.post('/api/admin/ban', (req, res) => {
-    const { username, banStatus } = req.body;
-    const db = readDB();
-    const cleanUsername = username.replace('@', '').toLowerCase();
-    const userKey = Object.keys(db.users).find(key => db.users[key].username === cleanUsername);
-
-    if (!userKey) return res.status(404).json({ error: 'Foydalanuvchi topilmadi' });
-
-    db.users[userKey].isBanned = banStatus;
-    writeDB(db);
-
-    bot.sendMessage(userKey, banStatus ? `❌ Siz admin tomonidan bloklandingiz.` : `✅ Siz blokdan chiqarildingiz!`);
-    res.json({ success: true });
+// Ta'mirlash rejimini yoqish/o'chirish
+app.post('/api/admin/maintenance', (req, res) => {
+    const { adminId, status } = req.body;
+    if (parseInt(adminId) !== ADMIN_ID) return res.status(403).json({ error: "Ruxsat etilmadi!" });
+    db.system.isMaintenance = status;
+    res.json({ success: true, isMaintenance: db.system.isMaintenance });
 });
 
-// Admin: Xabar tarqatish (Barcha ro'yxatdan o'tganlarga)
+// Yangi shablon qo'shish (Faqat admin tomonidan)
+app.post('/api/admin/add-template', (req, res) => {
+    const { adminId, name, price, daily, desc } = req.body;
+    if (parseInt(adminId) !== ADMIN_ID) return res.status(403).json({ error: "Ruxsat etilmadi!" });
+
+    const newTemplate = {
+        id: botTemplates.length + 1,
+        name: name.endsWith("(PHP)") ? name : name + " (PHP)",
+        price: parseFloat(price),
+        daily: parseFloat(daily),
+        desc: desc
+    };
+    botTemplates.push(newTemplate);
+    res.json({ success: true, templates: botTemplates });
+});
+
+// Global reklama/xabar tarqatish
 app.post('/api/admin/broadcast', (req, res) => {
-    const { message } = req.body;
-    const db = readDB();
-    const userKeys = Object.keys(db.users);
+    const { adminId, text } = req.body;
+    if (parseInt(adminId) !== ADMIN_ID) return res.status(403).json({ error: "Ruxsat etilmadi!" });
 
-    userKeys.forEach(chatId => {
-        bot.sendMessage(chatId, `📢 TEZKOR XABAR:\n\n${message}`).catch(() => {});
+    const userIds = Object.keys(db.users);
+    userIds.forEach(id => {
+        bot.sendMessage(id, `📢 **Tizim xabari:**\n\n${text}`, { parse_mode: "Markdown" }).catch(() => {});
     });
 
-    res.json({ success: true });
+    res.json({ success: true, count: userIds.length });
 });
 
 app.listen(PORT, () => {
-    console.log(`Node.js server ${PORT}-portda barqaror ishga tushdi.`);
+    console.log(`ZcMeker server is running on port ${PORT}`);
 });
+                                   
