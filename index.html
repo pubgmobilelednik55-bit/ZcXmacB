@@ -1,663 +1,921 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ZcMeker WebApp</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        purpleBg: '#0b0816',
-                        purpleCard: '#15102a',
-                        purplePrimary: '#6d28d9',
-                        purpleAccent: '#8b5cf6'
-                    },
-                    animation: {
-                        'spin-slow': 'spin 2s linear infinite',
-                        'fade-in': 'fadeIn 0.3s ease-out forwards',
-                        'scale-up': 'scaleUp 0.3s ease-out forwards'
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0', transform: 'translateY(8px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' }
-                        },
-                        scaleUp: {
-                            '0%': { transform: 'scale(0.96)', opacity: '0' },
-                            '100%': { transform: 'scale(1)', opacity: '1' }
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body {
-            background-color: #0b0816;
-            color: #f3f4f6;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-            overflow-x: hidden;
-        }
-        .nav-active {
-            color: #8b5cf6 !important;
-            transform: scale(1.08);
-        }
-        .nav-active i {
-            filter: drop-shadow(0 0 8px rgba(139, 92, 246, 0.6));
-        }
-        .tab-section {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0b0816;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #6d28d9;
-            border-radius: 10px;
-        }
-    </style>
-</head>
-<body class="pb-28">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ZcPinBot - Telegram Mini App</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <div id="loader-screen" class="fixed inset-0 bg-purpleBg flex flex-col items-center justify-center z-50 transition-opacity duration-500">
-        <div class="relative flex items-center justify-center mb-6">
-            <div class="w-20 h-20 rounded-full border-4 border-purplePrimary/20 border-t-purpleAccent animate-spin"></div>
-            <i class="fa-solid fa-robot text-3xl text-purpleAccent absolute animate-pulse"></i>
-        </div>
-        <h2 class="text-xl font-bold text-white tracking-widest animate-pulse mb-1">ZcMeker Bot</h2>
-        <p class="text-xs text-gray-400">Yuklanmoqda...</p>
-    </div>    <header class="bg-purpleCard p-4 flex justify-between items-center border-b border-purplePrimary/30 shadow-lg sticky top-0 z-40">
-        <div class="flex items-center space-x-2">
-            <i class="fa-solid fa-robot text-purpleAccent text-xl"></i>
-            <span class="font-bold text-lg text-purpleAccent">@ZcMekerBot</span>
-        </div>
-        <div class="bg-purpleBg px-3 py-1.5 rounded-full flex items-center space-x-2 border border-purplePrimary/40 transition-all active:scale-95">
-            <i class="fa-solid fa-wallet text-yellow-400 animate-pulse"></i>
-            <span id="top-balance" class="font-semibold text-sm">0 so'm</span>
-        </div>
-    </header>
+  <style>
+    :root {
+      --bg-color: #0d1117;
+      --card-bg: #161b22;
+      --text-color: #f0f6fc;
+      --accent-color: #1f6feb;
+      --accent-hover: #388bfd;
+      --border-color: #30363d;
+      --success-color: #2ea44f;
+      --danger-color: #da3637;
+      --muted-color: #8b949e;
+    }
 
-    <div id="maintenance-screen" class="hidden flex flex-col items-center justify-center min-h-[70vh] text-center p-6 animate-scale-up">
-        <i class="fa-solid fa-screwdriver-wrench text-6xl text-purpleAccent mb-4 animate-bounce"></i>
-        <h2 class="text-2xl font-bold mb-2">Tizim ta'mirlanmoqda</h2>
-        <p class="text-gray-400 text-sm">Tez orada bot yana o'z faoliyatini tiklaydi. Sabr qilganingiz uchun rahmat!</p>
+    [data-theme="light"] {
+      --bg-color: #f6f8fa;
+      --card-bg: #ffffff;
+      --text-color: #24292f;
+      --accent-color: #0969da;
+      --accent-hover: #1a7fec;
+      --border-color: #d0d7de;
+      --success-color: #1a7f37;
+      --danger-color: #cf222e;
+      --muted-color: #57606a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding-bottom: 70px;
+      font-size: 14px;
+    }
+
+    .container {
+      padding: 16px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .theme-toggle, .lang-toggle {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .header-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .balance-card {
+      background: linear-gradient(135deg, var(--accent-color), #0f3d8c);
+      padding: 20px;
+      border-radius: 16px;
+      color: white;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    .balance-info h3 {
+      font-size: 13px;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .balance-info .amount {
+      font-size: 26px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .btn-topup {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: white;
+      padding: 10px 18px;
+      border-radius: 25px;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+      backdrop-filter: blur(5px);
+    }
+
+    .section-title {
+      font-size: 18px;
+      margin-bottom: 15px;
+      font-weight: bold;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .game-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-card img {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      margin-bottom: 10px;
+    }
+
+    .game-card .title {
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .services-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .service-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 14px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .service-price {
+      color: var(--accent-color);
+      font-weight: bold;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 16px;
+    }
+
+    .modal-content {
+      background: var(--bg-color);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      cursor: pointer;
+      font-size: 20px;
+      color: var(--muted-color);
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-color);
+      margin-top: 10px;
+      margin-bottom: 20px;
+      outline: none;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 12px;
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .rating-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .rating-item {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      padding: 12px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .rating-rank {
+      width: 25px;
+      font-weight: bold;
+    }
+
+    .navbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 900;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: var(--muted-color);
+      text-decoration: none;
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--accent-color);
+    }
+
+    .nav-icon {
+      font-size: 20px;
+      margin-bottom: 3px;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    .admin-link-box {
+      margin-top: 30px;
+      padding: 15px;
+      text-align: center;
+      border-top: 1px dashed var(--border-color);
+    }
+
+    .admin-btn {
+      color: var(--accent-color);
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in-page {
+      animation: fadeIn 0.3s ease-in-out forwards;
+    }
+  </style>
+    </head><body>
+
+  <div class="container">
+
+    <div class="header">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">U</div>
+        <div>
+          <strong id="user-name">Yuklanmoqda...</strong>
+          <div style="font-size: 11px; color: var(--muted-color);" id="user-role">Foydalanuvchi</div>
+        </div>
+      </div>
+      <div class="header-buttons">
+        <button class="lang-toggle" onclick="toggleLanguage()">UZ/RU</button>
+        <button class="theme-toggle" onclick="toggleTheme()">🌙/☀️</button>
+      </div>
     </div>
 
-    <main id="main-content" class="p-4 space-y-6 hidden">
+    <div id="page-home" class="page active fade-in-page">
+      <div class="balance-card">
+        <div class="balance-info">
+          <h3 id="txt-balance-lbl">Balansingiz</h3>
+          <div class="amount"><span id="user-balance">0</span> so'm</div>
+        </div>
+        <div class="btn-topup" onclick="switchPage('page-deposit')" id="txt-topup-btn">+ To'ldirish</div>
+      </div>
 
-        <section id="sec-home" class="tab-section space-y-4">
-            <div class="bg-purpleCard p-6 rounded-2xl border border-purplePrimary/20 text-center relative overflow-hidden shadow-2xl">
-                <div class="absolute -right-10 -top-10 w-32 h-32 bg-purplePrimary/20 rounded-full blur-xl"></div>
-                <h1 class="text-xl font-bold mb-1">Xush kelibsiz!</h1>
-                <p class="text-xs text-gray-400 mb-6">Ushbu platforma orqali o'z botingizni yarating</p>
-                
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-purpleBg p-4 rounded-xl border border-purplePrimary/10 transition-transform active:scale-95">
-                        <i class="fa-solid fa-network-wired text-2xl text-purpleAccent mb-2"></i>
-                        <div id="home-active-bots" class="font-bold text-lg text-white">0 ta</div>
-                        <div class="text-[10px] text-gray-400">Faol botlaringiz</div>
-                    </div>
-                    <div class="bg-purpleBg p-4 rounded-xl border border-purplePrimary/10 transition-transform active:scale-95">
-                        <i class="fa-solid fa-coins text-2xl text-yellow-500 mb-2"></i>
-                        <div id="home-balance" class="font-bold text-lg text-white">0 so'm</div>
-                        <div class="text-[10px] text-gray-400">Sizning balansingiz</div>
-                    </div>
-                </div>
+      <div class="section-title" id="txt-games-lbl">Ommabop o'yinlar</div>
+      <div class="grid-container" id="categories-grid"></div>
+    </div>
 
-                <div class="space-y-3">
-                    <button onclick="switchTab('create')" class="w-full bg-purplePrimary hover:bg-purpleAccent active:scale-95 py-3.5 rounded-xl font-semibold flex justify-center items-center space-x-2 transition-all shadow-md">
-                        <i class="fa-solid fa-plus-circle"></i>
-                        <span>Yangi bot yaratish</span>
-                    </button>
-                    <button onclick="shareReferral()" class="w-full bg-purpleCard border border-purplePrimary/40 active:scale-95 py-3.5 rounded-xl font-semibold flex justify-center items-center space-x-2 transition-all">
-                        <i class="fa-solid fa-user-plus text-purpleAccent"></i>
-                        <span>Do'stlarni taklif qilish</span>
-                    </button>
-                </div>
-            </div>
-        </section>
+    <div id="page-services" class="page fade-in-page">
+      <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+        <button onclick="switchPage('page-home')" style="background: none; border: none; color: var(--text-color); font-size: 18px; cursor: pointer;">⬅️</button>
+        <h2 class="section-title" id="services-cat-title" style="margin-bottom: 0;">Xizmatlar</h2>
+      </div>
+      <div class="services-list" id="services-container"></div>
+    </div>
 
-        <section id="sec-bots" class="tab-section hidden space-y-4">
-            <h2 class="text-md font-bold flex items-center space-x-2 text-purpleAccent">
-                <i class="fa-solid fa-server"></i>
-                <span>Sizning faol botlaringiz</span>
-            </h2>
-            <div id="user-bots-list" class="space-y-3">
-                <p class="text-center text-gray-400 py-6 text-xs">Sizda hali yaratilgan botlar mavjud emas.</p>
-            </div>
-        </section>
+    <div id="page-deposit" class="page fade-in-page">
+      <h2 class="section-title" id="txt-deposit-lbl">Balansni to'ldirish</h2>
+      <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+        <p style="font-weight: bold; margin-bottom: 10px; color: var(--accent-color);">💳 VISA ORQALI TO'LOV</p>
+        <p style="margin-bottom: 8px;">Karta raqami: <strong style="font-size: 16px; color: var(--text-color);">4916 9903 5554 3858</strong></p>
+        <p style="margin-bottom: 8px;">Karta egasi: <strong>Xodjimova Sharifaxon</strong></p>
+        <p style="margin-bottom: 15px;">Ulangan telefon: <strong>+998932567801</strong></p>
+        <p style="font-size: 12px; color: var(--muted-color);" id="txt-deposit-help">Ushbu kartaga to'lov qilgach, to'lov skrinshotini hamda Telegram ID'ingizni texnik yordamga yuboring. Balansingiz 10-15 daqiqa ichida to'ldiriladi.</p>
+      </div>
 
-        <section id="sec-create" class="tab-section hidden space-y-4">
-            <h2 class="text-md font-bold flex items-center space-x-2 text-purpleAccent">
-                <i class="fa-solid fa-wand-magic-sparkles"></i>
-                <span>PHP Bot Konstruktori</span>
-            </h2>
-            <div class="grid grid-cols-1 gap-4" id="templates-container"></div>
+      <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px;">
+        <h3 style="font-size: 14px; margin-bottom: 10px;" id="txt-promo-lbl">Promokod kiritish</h3>
+        <input type="text" id="promo-code-input" class="input-field" placeholder="KOD-123" style="margin-bottom: 12px;">
+        <button class="btn-submit" onclick="usePromo()" id="txt-promo-btn">Aktivlashtirish</button>
+      </div>
+    </div>
 
-            <div id="creation-form" class="hidden bg-purpleCard p-5 rounded-2xl border border-purplePrimary/40 space-y-4 animate-scale-up">
-                <div class="flex justify-between items-center">
-                    <h3 id="selected-bot-title" class="font-bold text-md text-purpleAccent">Bot</h3>
-                    <button onclick="cancelCreation()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times text-lg"></i></button>
-                </div>
-                <div class="text-xs text-gray-300 space-y-2 bg-purpleBg p-3 rounded-lg">
-                    <div class="flex justify-between"><span>Yaratish narxi:</span><span id="form-price" class="text-purpleAccent font-bold">0 so'm</span></div>
-                    <div class="flex justify-between"><span>Kunlik xizmat to'lovi:</span><span id="form-daily" class="text-yellow-500 font-semibold">0 so'm</span></div>
-                </div>
-                <div>
-                    <label class="block text-[11px] text-gray-400 mb-1">Bot tokenini kiriting:</label>
-                    <input type="text" id="bot-token-input" placeholder="Tokenni bu yerga kiriting..." class="w-full bg-purpleBg border border-purplePrimary/30 rounded-xl p-3.5 text-sm focus:outline-none focus:border-purpleAccent">
-                </div>
-                <div>
-                    <label class="block text-[11px] text-gray-400 mb-1">Admin ID kiriting:</label>
-                    <input type="number" id="bot-adminid-input" placeholder="Admin telegram ID raqami..." class="w-full bg-purpleBg border border-purplePrimary/30 rounded-xl p-3.5 text-sm focus:outline-none focus:border-purpleAccent">
-                </div>
-                <button onclick="submitCreateBot()" class="w-full bg-purplePrimary hover:bg-purpleAccent active:scale-95 py-3.5 rounded-xl font-bold text-sm transition-all flex justify-center items-center space-x-2">
-                    <span>Botni yaratish</span>
-                    <i class="fa-solid fa-cube"></i>
-                </button>
-            </div>
-                        </section>        <section id="sec-guide" class="tab-section hidden space-y-4">
-            <div class="bg-purpleCard p-5 rounded-2xl border border-purplePrimary/20 space-y-4">
-                <h2 class="text-md font-bold text-purpleAccent flex items-center space-x-2">
-                    <i class="fa-solid fa-circle-question"></i>
-                    <span>Tizimdan foydalanish yo'riqnomasi</span>
-                </h2>
-                <div class="text-xs space-y-3 text-gray-300 leading-relaxed">
-                    <p class="font-semibold text-purpleAccent text-sm">1. Bot qanday ochiladi?</p>
-                    <p class="pl-3 border-l-2 border-purplePrimary/40">Telegramda @BotFather rasmiy boti orqali yangi bot yarating va uning API tokenini oling.</p>
-                    <p class="font-semibold text-purpleAccent text-sm">2. Konstruktordan foydalanish:</p>
-                    <p class="pl-3 border-l-2 border-purplePrimary/40">"Yaratish" bo'limiga o'ting, mos shablonni tanlang va bot tokeni hamda admin ID raqamingizni kiritib tasdiqlang.</p>
-                </div>
-            </div>
-        </section>
+    <div id="page-orders" class="page fade-in-page">
+      <h2 class="section-title" id="txt-orders-lbl">Mening buyurtmalarim</h2>
+      <div class="services-list" id="orders-container"></div>
+    </div>
 
-        <section id="sec-account" class="tab-section hidden space-y-4">
-            <div class="bg-purpleCard p-5 rounded-2xl border border-purplePrimary/20 text-center shadow-lg">
-                <div class="w-14 h-14 bg-purplePrimary/30 rounded-full mx-auto flex items-center justify-center mb-3 border border-purplePrimary/50">
-                    <i class="fa-solid fa-circle-user text-2xl text-purpleAccent animate-pulse"></i>
-                </div>
-                <h2 id="acc-username" class="font-bold text-md mb-4">@username</h2>
-                
-                <div class="space-y-3 text-xs text-left">
-                    <div class="bg-purpleBg p-3.5 rounded-xl flex justify-between items-center border border-purplePrimary/10">
-                        <span class="text-gray-400"><i class="fa-solid fa-fingerprint mr-2"></i>Sizning ID:</span>
-                        <span id="acc-id" class="font-semibold text-purpleAccent">Yuklanmoqda...</span>
-                    </div>
-                    <div class="bg-purpleBg p-3.5 rounded-xl flex justify-between items-center border border-purplePrimary/10">
-                        <span class="text-gray-400"><i class="fa-solid fa-list-ol mr-2"></i>Tizimdagi raqamingiz:</span>
-                        <span id="acc-order" class="font-semibold">Yuklanmoqda...</span>
-                    </div>
-                    <div class="bg-purpleBg p-3.5 rounded-xl flex justify-between items-center border border-purplePrimary/10">
-                        <span class="text-gray-400"><i class="fa-solid fa-dollar-sign mr-2"></i>Balans:</span>
-                        <span id="acc-balance" class="font-semibold text-green-400">0 so'm</span>
-                    </div>
-                    <div class="bg-purpleBg p-3.5 rounded-xl flex justify-between items-center border border-purplePrimary/10">
-                        <span class="text-gray-400"><i class="fa-solid fa-chart-line mr-2"></i>Jami kiritilgan pul:</span>
-                        <span id="acc-deposited" class="font-semibold text-yellow-500">0 so'm</span>
-                    </div>
-                </div>
+    <div id="page-rating" class="page fade-in-page">
+      <h2 class="section-title" id="txt-rating-lbl">Top Donaterlar (Reyting)</h2>
+      <div class="rating-list" id="rating-container"></div>
+    </div>
 
-                <div class="mt-6 space-y-3">
-                    <a href="https://t.me/CDXmc" target="_blank" class="w-full bg-purplePrimary active:scale-95 py-3.5 rounded-xl font-bold text-sm flex justify-center items-center space-x-2 shadow-md transition-all">
-                        <i class="fa-solid fa-circle-plus"></i>
-                        <span>Hisobni to'ldirish</span>
-                    </a>
-                    <div class="pt-4 border-t border-purplePrimary/20 flex justify-between items-center text-[10px] text-gray-400">
-                        <span>Loyiha: <strong class="text-purpleAccent">@ZcMekerBot</strong></span>
-                        <a href="https://t.me/CDXmc" target="_blank" class="hover:underline flex items-center space-x-1">
-                            <i class="fa-solid fa-user-shield text-purpleAccent"></i>
-                            <span>Admin: @CDXmc</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <div id="page-profile" class="page fade-in-page">
+      <h2 class="section-title" id="txt-profile-lbl">Mening Profilim</h2>
+      <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 20px; border-radius: 16px; text-align: center; margin-bottom: 20px;">
+        <div class="user-avatar" style="width: 70px; height: 70px; font-size: 28px; margin: 0 auto 15px;" id="profile-avatar">U</div>
+        <h3 id="profile-fullname">Yuklanmoqda...</h3>
+        <p style="color: var(--muted-color); font-size: 13px;" id="profile-username">@username</p>
+        <p style="color: var(--accent-color); font-weight: bold; margin-top: 10px;">ID: <span id="profile-tgid">0</span></p>
+      </div>
 
-        <section id="sec-admin-auth" class="tab-section hidden space-y-4">
-            <div class="bg-purpleCard p-6 rounded-2xl border border-purplePrimary/30 text-center space-y-4">
-                <i class="fa-solid fa-lock text-5xl text-purpleAccent animate-bounce"></i>
-                <h2 class="text-lg font-bold">Admin Panelga kirish</h2>
-                <p class="text-xs text-gray-400">Xavfsizlik yuzasidan parolingizni kiriting:</p>
-                <input type="password" id="admin-pass-input" placeholder="Parol (CDXMC)" class="w-full bg-purpleBg border border-purplePrimary/30 rounded-xl p-3.5 text-center text-sm focus:outline-none focus:border-purpleAccent tracking-widest font-bold">
-                <button onclick="verifyAdminPassword()" class="w-full bg-purplePrimary py-3.5 rounded-xl font-bold text-xs transition-all active:scale-95">Kirishni tasdiqlash</button>
-            </div>
-        </section>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; text-align: center;">
+          <div style="color: var(--muted-color); font-size: 11px;" id="txt-prof-orders">Buyurtmalarim</div>
+          <strong style="font-size: 20px;" id="profile-orders-count">0</strong>
+        </div>
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; text-align: center;">
+          <div style="color: var(--muted-color); font-size: 11px;" id="txt-prof-spent">Jami xarajat</div>
+          <strong style="font-size: 20px;" id="profile-spent-money">0 so'm</strong>
+        </div>
+      </div>
 
-        <section id="sec-admin" class="tab-section hidden space-y-4">
-            <div class="bg-purpleCard p-5 rounded-2xl border border-purplePrimary/30 space-y-4">
-                <h2 class="text-md font-bold text-purpleAccent flex items-center space-x-2">
-                    <i class="fa-solid fa-shield-halved animate-pulse"></i>
-                    <span>CDXMC Admin Boshqaruvi</span>
-                </h2>
+      <div style="margin-top: 15px; background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; text-align: center; cursor: pointer;" onclick="alert('Tez kunda...')">
+        👥 <strong id="txt-referral">Do'stni taklif qilish</strong>
+      </div>
 
-                <div class="grid grid-cols-2 gap-3 bg-purpleBg p-3.5 rounded-xl border border-purplePrimary/10">
-                    <div class="text-center p-2">
-                        <div id="stat-total-users" class="font-bold text-lg text-purpleAccent">0</div>
-                        <div class="text-[9px] text-gray-400">Jami Foydalanuvchilar</div>
-                    </div>
-                    <div class="text-center p-2">
-                        <div id="stat-total-bots" class="font-bold text-lg text-green-400">0</div>
-                        <div class="text-[9px] text-gray-400">Jami Yaratilgan Botlar</div>
-                    </div>
-                </div>
+      <div class="admin-link-box">
+        <a href="https://t.me/CDXmc" target="_blank" class="admin-btn">Admin: @CDXmc</a>
+      </div>
+    </div>
 
-                <div class="bg-purpleBg p-3.5 rounded-xl space-y-3">
-                    <h4 class="font-semibold text-xs text-purpleAccent">Foydalanuvchi balansini tahrirlash</h4>
-                    <input type="text" id="adm-user-id" placeholder="Foydalanuvchi telegram ID raqami" class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none">
-                    <input type="number" id="adm-amount" placeholder="Summa (so'm)" class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none">
-                    <div class="flex space-x-2">
-                        <button onclick="changeBalance('add')" class="flex-1 bg-purplePrimary active:scale-95 py-3 rounded-lg text-xs font-bold transition-all">Qo'shish</button>
-                        <button onclick="changeBalance('remove')" class="flex-1 bg-red-600/50 hover:bg-red-600 active:scale-95 py-3 rounded-lg text-xs font-bold transition-all">Ayirish</button>
-                    </div>
-                </div>
+    <div id="page-admin" class="page fade-in-page">
+      <h2 class="section-title">Admin Panel</h2>
+      <div id="admin-login-sec">
+        <input type="password" id="admin-pass-input" class="input-field" placeholder="Admin parolini kiriting...">
+        <button class="btn-submit" onclick="adminLogin()">Kirish</button>
+      </div>
+      
+      <div id="admin-content-sec" style="display: none;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px;">
+          <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 10px; color: var(--muted-color);">Foydalanuvchilar</div>
+            <strong id="adm-stat-users">0</strong>
+          </div>
+          <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 10px; color: var(--muted-color);">Buyurtmalar</div>
+            <strong id="adm-stat-orders">0</strong>
+          </div>
+          <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 10px; border-radius: 8px; text-align: center;">
+            <div style="font-size: 10px; color: var(--muted-color);">Kassa</div>
+            <strong id="adm-stat-cash">0</strong>
+          </div>
+        </div>
 
-                <div class="bg-purpleBg p-3.5 rounded-xl space-y-3">
-                    <h4 class="font-semibold text-xs text-purpleAccent">Yangi PHP Bot shabloni yuklash</h4>
-                    <input type="text" id="adm-bot-name" placeholder="Bot nomi (SMM Bot, Konstruktor...)" class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none">
-                    <input type="number" id="adm-bot-price" placeholder="Yaratish narxi (so'm)" class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none">
-                    <input type="number" id="adm-bot-daily" placeholder="Kunlik xizmat to'lovi (so'm)" class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none">
-                    <textarea id="adm-bot-desc" placeholder="Shablon haqida batafsil tavsif kiriting..." class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none h-14"></textarea>
-                    
-                    <div>
-                        <label class="block text-[10px] text-gray-400 mb-1"><i class="fa-solid fa-file-code"></i> PHP faylni yuklang:</label>
-                        <input type="file" id="adm-bot-file" accept=".php" class="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-purpleCard file:text-purpleAccent file:font-semibold">
-                    </div>
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+          <h4>Balans boshqarish</h4>
+          <input type="number" id="adm-user-id" class="input-field" placeholder="Telegram ID" style="margin-bottom: 8px;">
+          <input type="number" id="adm-amount" class="input-field" placeholder="Miqdor" style="margin-bottom: 8px;">
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-submit" style="background: var(--success-color);" onclick="updateUserBalance('add')">Qo'shish</button>
+            <button class="btn-submit" style="background: var(--danger-color);" onclick="updateUserBalance('sub')">Ayirish</button>
+          </div>
+        </div>
 
-                    <button onclick="addBotTemplate()" class="w-full bg-purplePrimary py-3 rounded-lg text-xs font-bold active:scale-95 transition-all">PHP Shabloni va Faylni Qo'shish</button>
-                </div>
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px; margin-bottom: 15px;">
+          <h4>Yangi Promokod Yaratish</h4>
+          <input type="text" id="adm-promo-code" class="input-field" placeholder="Promo Kod Nomi" style="margin-bottom: 8px;">
+          <input type="number" id="adm-promo-reward" class="input-field" placeholder="Mukofot miqdori (Sum)" style="margin-bottom: 8px;">
+          <button class="btn-submit" onclick="createPromo()">Promokod Yaratish</button>
+        </div>
 
-                <div class="bg-purpleBg p-3.5 rounded-xl space-y-2">
-                    <h4 class="font-semibold text-xs text-purpleAccent"><i class="fa-solid fa-users"></i> Foydalanuvchilar Ro'yxati</h4>
-                    <div class="overflow-x-auto max-h-48 rounded-lg border border-purplePrimary/20">
-                        <table class="w-full text-left text-[10px] text-gray-300">
-                            <thead class="bg-purpleCard text-purpleAccent uppercase">
-                                <tr>
-                                    <th class="p-2 border-b border-purplePrimary/20">ID</th>
-                                    <th class="p-2 border-b border-purplePrimary/20">Username</th>
-                                    <th class="p-2 border-b border-purplePrimary/20">Balans</th>
-                                    <th class="p-2 border-b border-purplePrimary/20">Sana</th>
-                                </tr>
-                            </thead>
-                            <tbody id="admin-users-table-body">
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
+        <div style="background: var(--card-bg); border: 1px solid var(--border-color); padding: 15px; border-radius: 12px;">
+          <h4>Reklama Tarqatish</h4>
+          <textarea id="adm-broadcast-msg" class="input-field" placeholder="Xabar matni..." style="height: 80px; margin-bottom: 8px;"></textarea>
+          <button class="btn-submit" onclick="broadcastMessage()">Xabarni Yuborish</button>
+        </div>
+      </div>
+    </div>
 
-                <div class="bg-purpleBg p-3.5 rounded-xl space-y-2">
-                    <h4 class="font-semibold text-xs text-purpleAccent">Global xabar yuborish</h4>
-                    <textarea id="adm-broadcast-text" placeholder="Barcha foydalanuvchilarga xabar matni..." class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none h-14"></textarea>
-                    <button onclick="sendBroadcast()" class="w-full bg-purplePrimary py-3 rounded-lg text-xs font-bold active:scale-95 transition-all">Xabarni yuborish</button>
-                </div>
+  </div>
 
-                <div class="flex justify-between items-center bg-purpleBg p-3.5 rounded-xl">
-                    <span class="text-xs font-semibold">Tizim holati:</span>
-                    <button id="maintenance-toggle-btn" onclick="toggleMaintenance()" class="bg-green-600 px-5 py-2.5 rounded-lg text-xs font-bold active:scale-95 transition-all">Bot: ON</button>
-                </div>
-            </div>
-        </section>
+  <div class="modal" id="buy-modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <h3 style="margin-bottom: 10px;" id="modal-service-title">Sotib olish</h3>
+      <p style="margin-bottom: 15px; color: var(--accent-color); font-weight: bold;"><span id="modal-service-price">0</span> so'm</p>
+      
+      <label style="font-weight: bold;" id="txt-playerid-lbl">Player ID kiritish</label>
+      <input type="text" id="player-id-input" class="input-field" placeholder="Masalan: 15794621780">
+      
+      <button class="btn-submit" onclick="confirmPurchase()" id="txt-confirm-btn">Tekshirish va Sotib olish</button>
+    </div>
+  </div>
 
-                        </main>
-                                                            <nav class="fixed bottom-0 left-0 right-0 bg-purpleCard/95 backdrop-blur-md border-t border-purplePrimary/30 py-4.5 flex justify-around items-center z-50 shadow-[0_-5px_25px_rgba(0,0,0,0.6)]">
-        <button onclick="switchTab('home')" class="flex flex-col items-center space-y-2 text-gray-400 hover:text-purpleAccent transition-all duration-300 active:scale-90" id="nav-home">
-            <i class="fa-solid fa-house text-xl"></i>
-            <span class="text-[11px] font-semibold tracking-wide">Bosh sahifa</span>
-        </button>
-        <button onclick="switchTab('bots')" class="flex flex-col items-center space-y-2 text-gray-400 hover:text-purpleAccent transition-all duration-300 active:scale-90" id="nav-bots">
-            <i class="fa-solid fa-server text-xl"></i>
-            <span class="text-[11px] font-semibold tracking-wide">Botlarim</span>
-        </button>
-        <button onclick="switchTab('create')" class="flex flex-col items-center space-y-2 text-gray-400 hover:text-purpleAccent transition-all duration-300 active:scale-90" id="nav-create">
-            <i class="fa-solid fa-circle-plus text-xl"></i>
-            <span class="text-[11px] font-semibold tracking-wide">Yaratish</span>
-        </button>
-        <button onclick="switchTab('guide')" class="flex flex-col items-center space-y-2 text-gray-400 hover:text-purpleAccent transition-all duration-300 active:scale-90" id="nav-guide">
-            <i class="fa-solid fa-circle-question text-xl"></i>
-            <span class="text-[11px] font-semibold tracking-wide">Qo'llanma</span>
-        </button>
-        <button onclick="switchTab('account')" class="flex flex-col items-center space-y-2 text-gray-400 hover:text-purpleAccent transition-all duration-300 active:scale-90" id="nav-account">
-            <i class="fa-solid fa-user-gear text-xl"></i>
-            <span class="text-[11px] font-semibold tracking-wide">Akkaunt</span>
-        </button>
-    </nav>
+  <div class="navbar">
+    <div class="nav-item active" onclick="switchPage('page-home')" id="nav-home">
+      <div class="nav-icon">🎮</div>
+      <span id="txt-nav-games">O'yinlar</span>
+    </div>
+    <div class="nav-item" onclick="switchPage('page-deposit')" id="nav-deposit">
+      <div class="nav-icon">💳</div>
+      <span id="txt-nav-pay">To'ldirish</span>
+    </div>
+    <div class="nav-item" onclick="switchPage('page-orders')" id="nav-orders">
+      <div class="nav-icon">🕒</div>
+      <span id="txt-nav-orders">Buyurtmalar</span>
+    </div>
+    <div class="nav-item" onclick="switchPage('page-rating')" id="nav-rating">
+      <div class="nav-icon">🏆</div>
+      <span id="txt-nav-rating">Reyting</span>
+    </div>
+    <div class="nav-item" onclick="switchPage('page-profile')" id="nav-profile">
+      <div class="nav-icon">👤</div>
+      <span id="txt-nav-profile">Profil</span>
+    </div>
+    <div class="nav-item" onclick="switchPage('page-admin')" id="nav-admin" style="display: none;">
+      <div class="nav-icon">⚙️</div>
+      <span>Admin</span>
+    </div>
+    </div>
+                                                                                                                              <script>
+    const translations = {
+      uz: {
+        balance_lbl: "Balansingiz",
+        topup_btn: "+ To'ldirish",
+        games_lbl: "Ommabop o'yinlar",
+        deposit_lbl: "Balansni to'ldirish",
+        promo_lbl: "Promokod kiritish",
+        promo_btn: "Aktivlashtirish",
+        orders_lbl: "Mening buyurtmalarim",
+        rating_lbl: "Top Donaterlar (Reyting)",
+        profile_lbl: "Mening Profilim",
+        prof_orders: "Buyurtmalarim",
+        prof_spent: "Jami xarajat",
+        referral: "Do'stni taklif qilish",
+        playerid_lbl: "Player ID kiritish",
+        confirm_btn: "Tekshirish va Sotib olish",
+        nav_games: "O'yinlar",
+        nav_pay: "To'ldirish",
+        nav_orders: "Buyurtmalar",
+        nav_rating: "Reyting",
+        nav_profile: "Profil"
+      },
+      ru: {
+        balance_lbl: "Ваш баланс",
+        topup_btn: "+ Пополнить",
+        games_lbl: "Популярные игры",
+        deposit_lbl: "Пополнение баланса",
+        promo_lbl: "Ввести промокод",
+        promo_btn: "Активировать",
+        orders_lbl: "Мои заказы",
+        rating_lbl: "Топ донатеров (Рейтинг)",
+        profile_lbl: "Мой профиль",
+        prof_orders: "Мои заказы",
+        prof_spent: "Всего потрачено",
+        referral: "Пригласить друга",
+        playerid_lbl: "Введите Player ID",
+        confirm_btn: "Проверить и купить",
+        nav_games: "Игры",
+        nav_pay: "Пополнить",
+        nav_orders: "Заказы",
+        nav_rating: "Рейтинг",
+        nav_profile: "Профиль"
+      }
+    };
+  </script>
 
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('userId') || 8379904990; // Admin ID: 8379904990
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-        let currentUser = null;
-        let templates = [];
-        let isAdminAuthenticated = false;
+    const API_URL = 'https://animezcbot.onrender.com'; 
+    const ADMIN_TG_ID = 7271550202; 
 
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(async () => {
-                await initApp();
-                
-                const loader = document.getElementById('loader-screen');
-                const mainContent = document.getElementById('main-content');
-                
-                loader.classList.add('opacity-0');
-                setTimeout(() => {
-                    loader.classList.add('hidden');
-                    mainContent.classList.remove('hidden');
-                    mainContent.classList.add('animate-fade-in');
-                }, 500);
-            }, 3000);
+    let userTelegramId = tg.initDataUnsafe?.user?.id || 7271550202; 
+    let userFullname = tg.initDataUnsafe?.user?.first_name || 'Muhammadaziz';
+    let userUsername = tg.initDataUnsafe?.user?.username || 'NoUsername';
+
+    let currentLanguage = 'uz';
+    let currentSelectedServiceId = null;
+
+    window.onload = function() {
+      if (userTelegramId === ADMIN_TG_ID) {
+        document.getElementById('nav-admin').style.display = 'flex';
+        document.getElementById('user-role').innerText = 'Admin 👑';
+      }
+
+      document.getElementById('user-name').innerText = userFullname;
+      document.getElementById('user-avatar').innerText = userFullname.charAt(0).toUpperCase();
+      document.getElementById('profile-fullname').innerText = userFullname;
+      document.getElementById('profile-username').innerText = '@' + userUsername;
+      document.getElementById('profile-tgid').innerText = userTelegramId;
+      document.getElementById('profile-avatar').innerText = userFullname.charAt(0).toUpperCase();
+
+      loadUserData();
+      loadCategories();
+      loadRating();
+      applyLanguage();
+    };
+
+    function toggleLanguage() {
+      currentLanguage = currentLanguage === 'uz' ? 'ru' : 'uz';
+      applyLanguage();
+    }
+
+    function applyLanguage() {
+      const trans = translations[currentLanguage];
+      document.getElementById('txt-balance-lbl').innerText = trans.balance_lbl;
+      document.getElementById('txt-topup-btn').innerText = trans.topup_btn;
+      document.getElementById('txt-games-lbl').innerText = trans.games_lbl;
+      document.getElementById('txt-deposit-lbl').innerText = trans.deposit_lbl;
+      document.getElementById('txt-promo-lbl').innerText = trans.promo_lbl;
+      document.getElementById('txt-promo-btn').innerText = trans.promo_btn;
+      document.getElementById('txt-orders-lbl').innerText = trans.orders_lbl;
+      document.getElementById('txt-rating-lbl').innerText = trans.rating_lbl;
+      document.getElementById('txt-profile-lbl').innerText = trans.profile_lbl;
+      document.getElementById('txt-prof-orders').innerText = trans.prof_orders;
+      document.getElementById('txt-prof-spent').innerText = trans.prof_spent;
+      document.getElementById('txt-referral').innerText = trans.referral;
+      document.getElementById('txt-playerid-lbl').innerText = trans.playerid_lbl;
+      document.getElementById('txt-confirm-btn').innerText = trans.confirm_btn;
+      
+      document.getElementById('txt-nav-games').innerText = trans.nav_games;
+      document.getElementById('txt-nav-pay').innerText = trans.nav_pay;
+      document.getElementById('txt-nav-orders').innerText = trans.nav_orders;
+      document.getElementById('txt-nav-rating').innerText = trans.nav_rating;
+      document.getElementById('txt-nav-profile').innerText = trans.nav_profile;
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      if (body.getAttribute('data-theme') === 'light') {
+        body.removeAttribute('data-theme');
+      } else {
+        body.setAttribute('data-theme', 'light');
+      }
+    }
+
+    function switchPage(pageId) {
+      document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+      document.getElementById(pageId).classList.add('active');
+
+      document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+      const navId = 'nav-' + pageId.replace('page-', '');
+      if (document.getElementById(navId)) {
+        document.getElementById(navId).classList.add('active');
+      }
+
+      if (pageId === 'page-orders') loadOrders();
+      if (pageId === 'page-rating') loadRating();
+      if (pageId === 'page-profile') loadUserData();
+    }
+
+    function loadUserData() {
+      fetch(`${API_URL}/api/user/${userTelegramId}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('user-balance').innerText = data.balance.toLocaleString();
+          document.getElementById('profile-orders-count').innerText = data.total_orders;
+          document.getElementById('profile-spent-money').innerText = data.spent_money.toLocaleString() + " so'm";
+        })
+        .catch(err => console.error('User yuklanmadi:', err));
+    }
+
+    function loadCategories() {
+      fetch(`${API_URL}/api/categories`)
+        .then(res => res.json())
+        .then(data => {
+          const grid = document.getElementById('categories-grid');
+          grid.innerHTML = '';
+          data.forEach(cat => {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            card.onclick = () => openCategory(cat.id, cat.title);
+            
+            const imgUrl = cat.title === 'PUBG Mobile' ? 'https://upload.wikimedia.org/wikipedia/en/a/a2/Pubg_mobile_cover.jpeg' : API_URL + cat.image_url;
+
+            card.innerHTML = `
+              <img src="${imgUrl}" alt="${cat.title}" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3408/3408506.png'">
+              <div class="title">${cat.title}</div>
+            `;
+            grid.appendChild(card);
+          });
         });
+    }
 
-        async function initApp() {
-            try {
-                const response = await fetch(`/api/user/${userId}`);
-                const data = await response.json();
-                
-                currentUser = data.user;
-                templates = data.templates;
+    function openCategory(catId, catTitle) {
+      document.getElementById('services-cat-title').innerText = catTitle;
+      switchPage('page-services');
 
-                if (data.system.isMaintenance && parseInt(userId) !== 8379904990) {
-                    document.getElementById('main-content').classList.add('hidden');
-                    document.getElementById('maintenance-screen').classList.remove('hidden');
-                    return;
-                }
+      fetch(`${API_URL}/api/services/${catId}`)
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('services-container');
+          container.innerHTML = '';
+          data.forEach(srv => {
+            const item = document.createElement('div');
+            item.className = 'service-item';
+            item.onclick = () => openBuyModal(srv.id, srv.title, srv.price);
+            item.innerHTML = `
+              <strong>${srv.title}</strong>
+              <span class="service-price">${srv.price.toLocaleString()} so'm</span>
+            `;
+            container.appendChild(item);
+          });
+        });
+    }
 
-                document.getElementById('top-balance').innerText = currentUser.balance.toLocaleString() + ' so\'m';
-                document.getElementById('home-balance').innerText = currentUser.balance.toLocaleString() + ' so\'m';
-                document.getElementById('home-active-bots').innerText = currentUser.createdBots.length + ' ta';
-                
-                document.getElementById('acc-username').innerText = currentUser.username;
-                document.getElementById('acc-id').innerText = currentUser.id;
-                document.getElementById('acc-order').innerText = currentUser.regOrder;
-                document.getElementById('acc-balance').innerText = currentUser.balance.toLocaleString() + ' so\'m';
-                document.getElementById('acc-deposited').innerText = currentUser.deposited.toLocaleString() + ' so\'m';
+    function openBuyModal(id, title, price) {
+      currentSelectedServiceId = id;
+      document.getElementById('modal-service-title').innerText = title;
+      document.getElementById('modal-service-price').innerText = price.toLocaleString();
+      document.getElementById('buy-modal').style.display = 'flex';
+    }
 
-                // Botlarim ro'yxati
-                const userBotsContainer = document.getElementById('user-bots-list');
-                if (currentUser.createdBots.length > 0) {
-                    userBotsContainer.innerHTML = '';
-                    currentUser.createdBots.forEach(bot => {
-                        userBotsContainer.innerHTML += `
-                            <div class="bg-purpleCard p-4 rounded-xl border border-purplePrimary/30 flex justify-between items-center text-xs animate-scale-up">
-                                <div>
-                                    <div class="font-bold text-purpleAccent">${bot.name}</div>
-                                    <div class="text-[10px] text-gray-400 mt-0.5">${bot.username}</div>
-                                </div>
-                                <span class="bg-green-600/20 text-green-400 text-[10px] px-2 py-1 rounded-full border border-green-500/20">Ishlamoqda</span>
-                            </div>
-                        `;
-                    });
-                } else {
-                    userBotsContainer.innerHTML = '<p class="text-center text-gray-400 py-6 text-xs">Sizda hali yaratilgan botlar mavjud emas.</p>';
-                }
+    function closeModal() {
+      document.getElementById('buy-modal').style.display = 'none';
+      document.getElementById('player-id-input').value = '';
+    }
 
-                // Shablonlar ro'yxati
-                const templatesContainer = document.getElementById('templates-container');
-                templatesContainer.innerHTML = '';
-                if (templates.length > 0) {
-                    templates.forEach(t => {
-                        templatesContainer.innerHTML += `
-                            <div class="bg-purpleCard p-4 rounded-xl border border-purplePrimary/20 flex justify-between items-center text-xs transition-all active:scale-[0.98] animate-scale-up">
-                                <div class="max-w-[70%]">
-                                    <h3 class="font-bold text-purpleAccent text-sm">${t.name}</h3>
-                                    <p class="text-gray-400 text-[10px] mt-1">${t.desc}</p>
-                                    <div class="text-[10px] text-yellow-500 mt-2 font-medium">Kunlik xizmat haqi: ${t.daily.toLocaleString()} so'm</div>
-                                </div>
-                                <div class="text-right flex flex-col items-end space-y-2">
-                                    <span class="text-xs font-bold text-green-400">${t.price.toLocaleString()} so'm</span>
-                                    <button onclick="selectTemplate(${t.id})" class="bg-purplePrimary text-white text-[10px] px-3.5 py-2 rounded-lg font-bold hover:bg-purpleAccent transition-all active:scale-90">Tanlash</button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                } else {
-                    templatesContainer.innerHTML = '<p class="text-center text-gray-400 py-6 text-xs">Hozircha hech qanday bot shabloni mavjud emas.</p>';
-                }
+    function confirmPurchase() {
+      const playerId = document.getElementById('player-id-input').value.trim();
+      if (!playerId) {
+        alert("Iltimos Player ID kiriting!");
+        return;
+      }
 
-                // ADMIN ID TEKSHIRISH (Faqat 8379904990)
-                if (parseInt(userId) === 8379904990) {
-                    const nav = document.querySelector('nav');
-                    if (!document.getElementById('nav-admin')) {
-                        nav.innerHTML += `
-                            <button onclick="clickAdminTab()" class="flex flex-col items-center space-y-2 text-gray-400 hover:text-purpleAccent transition-all duration-300 active:scale-90" id="nav-admin">
-                                <i class="fa-solid fa-lock text-xl text-purpleAccent animate-bounce"></i>
-                                <span class="text-[11px] font-semibold tracking-wide">Admin</span>
-                            </button>
-                        `;
-                    }
-
-                    // Statisika yuklash
-                    document.getElementById('stat-total-users').innerText = data.totalUsers;
-                    document.getElementById('stat-total-bots').innerText = data.system.createdBotsCount;
-
-                    // Foydalanuvchilar jadvali
-                    const userTable = document.getElementById('admin-users-table-body');
-                    userTable.innerHTML = '';
-                    data.allUsers.forEach(u => {
-                        userTable.innerHTML += `
-                            <tr class="border-b border-purplePrimary/10">
-                                <td class="p-2 font-mono">${u.id}</td>
-                                <td class="p-2 text-purpleAccent">${u.username}</td>
-                                <td class="p-2 text-green-400">${u.balance.toLocaleString()} so'm</td>
-                                <td class="p-2 text-gray-400">${u.regDate || '-'}</td>
-                            </tr>
-                        `;
-                    });
-
-                    if (data.system.isMaintenance) {
-                        document.getElementById('maintenance-toggle-btn').innerText = "Bot: OFF (Ta'mirda)";
-                        document.getElementById('maintenance-toggle-btn').className = "bg-red-600 px-5 py-2.5 rounded-lg text-xs font-bold";
-                    } else {
-                        document.getElementById('maintenance-toggle-btn').innerText = "Bot: ON (Faol)";
-                        document.getElementById('maintenance-toggle-btn').className = "bg-green-600 px-5 py-2.5 rounded-lg text-xs font-bold";
-                    }
-                }
-
-            } catch (err) {
-                console.error("Xatolik:", err);
-            }
+      fetch(`${API_URL}/api/buy`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegram_id: userTelegramId,
+          service_id: currentSelectedServiceId,
+          player_id: playerId
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        if (data.success) {
+          closeModal();
+          loadUserData();
+          switchPage('page-orders');
         }
+      });
+    }
 
-        function clickAdminTab() {
-            if (isAdminAuthenticated) {
-                switchTab('admin');
-            } else {
-                switchTab('admin-auth');
-            }
+    function usePromo() {
+      const code = document.getElementById('promo-code-input').value.trim();
+      if (!code) {
+        alert("Kod kiritilmadi!");
+        return;
+      }
+
+      fetch(`${API_URL}/api/use-promo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegram_id: userTelegramId,
+          code: code
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        alert(data.message);
+        if (data.success) {
+          document.getElementById('promo-code-input').value = '';
+          loadUserData();
         }
+      });
+    }
 
-        async function verifyAdminPassword() {
-            const password = document.getElementById('admin-pass-input').value.trim();
-            try {
-                const res = await fetch('/api/admin/verify-password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ adminId: userId, password })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    isAdminAuthenticated = true;
-                    alert("Tizimga muvaffaqiyatli kirildi!");
-                    switchTab('admin');
-                } else {
-                    alert(data.error);
-                }
-            } catch (err) {
-                alert("Serverga ulanishda xatolik!");
-            }
+    function loadOrders() {
+      fetch(`${API_URL}/api/orders/${userTelegramId}`)
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('orders-container');
+          container.innerHTML = '';
+          if (data.length === 0) {
+            container.innerHTML = `<p style="text-align:center; color: var(--muted-color); padding: 20px;">Sizda hali buyurtmalar yo'q.</p>`;
+            return;
+          }
+          data.forEach(order => {
+            const color = order.status === 'Bajarildi' ? 'var(--success-color)' : order.status === 'Rad etildi' ? 'var(--danger-color)' : 'var(--accent-color)';
+            const item = document.createElement('div');
+            item.className = 'service-item';
+            item.innerHTML = `
+              <div>
+                <strong>${order.service_title}</strong>
+                <div style="font-size: 11px; color: var(--muted-color); margin-top: 4px;">Player ID: ${order.player_id}</div>
+              </div>
+              <div style="text-align: right;">
+                <strong style="color: ${color};">${order.status}</strong>
+                <div style="font-size: 12px; font-weight: bold; margin-top: 4px;">${order.price.toLocaleString()} so'm</div>
+              </div>
+            `;
+            container.appendChild(item);
+          });
+        });
+    }
+
+    function loadRating() {
+      fetch(`${API_URL}/api/rating`)
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('rating-container');
+          container.innerHTML = '';
+          data.forEach((user, index) => {
+            const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : (index + 1);
+            const item = document.createElement('div');
+            item.className = 'rating-item';
+            item.innerHTML = `
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="rating-rank">${rankEmoji}</div>
+                <strong>${user.fullname}</strong>
+              </div>
+              <div>
+                <strong>${user.spent_money.toLocaleString()} so'm</strong>
+                <span style="font-size: 11px; color: var(--muted-color);"> (${user.total_orders} ta buyurtma)</span>
+              </div>
+            `;
+            container.appendChild(item);
+          });
+        });
+    }
+
+    // --- ADMIN PANEL HARAKATLARI ---
+    function adminLogin() {
+      const pass = document.getElementById('admin-pass-input').value;
+      fetch(`${API_URL}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pass })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById('admin-login-sec').style.display = 'none';
+          document.getElementById('admin-content-sec').style.display = 'block';
+          loadAdminStats();
+        } else {
+          alert(data.message);
         }
+      });
+    }
 
-        function switchTab(tabId) {
-            const sections = ['sec-home', 'sec-bots', 'sec-create', 'sec-guide', 'sec-account', 'sec-admin-auth', 'sec-admin'];
-            sections.forEach(sec => {
-                const el = document.getElementById(sec);
-                if (el) el.classList.add('hidden');
-            });
-            document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+    function loadAdminStats() {
+      fetch(`${API_URL}/api/admin/stats`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('adm-stat-users').innerText = data.total_users;
+          document.getElementById('adm-stat-orders').innerText = data.total_orders;
+          document.getElementById('adm-stat-cash').innerText = data.total_revenue.toLocaleString() + " so'm";
+        });
+    }
 
-            const navs = ['nav-home', 'nav-bots', 'nav-create', 'nav-guide', 'nav-account', 'nav-admin'];
-            navs.forEach(nav => {
-                const el = document.getElementById(nav);
-                if (el) el.classList.remove('nav-active');
-            });
-            
-            let activeTabId = tabId === 'admin-auth' ? 'admin' : tabId;
-            const activeNav = document.getElementById(`nav-${activeTabId}`);
-            if (activeNav) activeNav.classList.add('nav-active');
+    function updateUserBalance(action) {
+      const tgId = document.getElementById('adm-user-id').value;
+      const amount = document.getElementById('adm-amount').value;
+      
+      if (!tgId || !amount) return alert("Hamma maydonlarni to'ldiring!");
+
+      fetch(`${API_URL}/api/admin/update-balance`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ telegram_id: tgId, amount: amount, action: action })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("Balans muvaffaqiyatli tahrirlandi!");
+          document.getElementById('adm-user-id').value = '';
+          document.getElementById('adm-amount').value = '';
+          loadAdminStats();
+        } else {
+          alert("Xatolik yuz berdi.");
         }
+      });
+    }
 
-        function shareReferral() {
-            const refLink = `https://t.me/ZcMekerBot?start=${userId}`;
-            navigator.clipboard.writeText(refLink);
-            alert("Referal havolangiz nusxalandi!");
+    function createPromo() {
+      const code = document.getElementById('adm-promo-code').value;
+      const reward = document.getElementById('adm-promo-reward').value;
+
+      if (!code || !reward) return alert("Hamma maydonlarni to'ldiring!");
+
+      fetch(`${API_URL}/api/admin/add-promo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: code, reward: reward })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("Yangi promokod yaratildi!");
+          document.getElementById('adm-promo-code').value = '';
+          document.getElementById('adm-promo-reward').value = '';
+        } else {
+          alert("Bunday kod mavjud yoki xatolik yuz berdi.");
         }
+      });
+    }
 
-        let selectedTemplateId = null;
-        function selectTemplate(id) {
-            selectedTemplateId = id;
-            const t = templates.find(item => item.id === id);
-            document.getElementById('selected-bot-title').innerText = t.name;
-            document.getElementById('form-price').innerText = t.price.toLocaleString() + ' so\'m';
-            document.getElementById('form-daily').innerText = t.daily.toLocaleString() + ' so\'m';
-            document.getElementById('templates-container').classList.add('hidden');
-            document.getElementById('creation-form').classList.remove('hidden');
+    function broadcastMessage() {
+      const msg = document.getElementById('adm-broadcast-msg').value;
+      if (!msg) return alert("Xabar yozilmagan!");
+
+      fetch(`${API_URL}/api/admin/broadcast`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: msg })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert("Xabar muvaffaqiyatli tarqatildi!");
+          document.getElementById('adm-broadcast-msg').value = '';
         }
-
-        function cancelCreation() {
-            document.getElementById('templates-container').classList.remove('hidden');
-            document.getElementById('creation-form').classList.add('hidden');
-        }
-
-        async function submitCreateBot() {
-            const token = document.getElementById('bot-token-input').value.trim();
-            const botAdminId = document.getElementById('bot-adminid-input').value.trim();
-
-            if (!token || !botAdminId) {
-                alert("Hamma ma'lumotlarni to'ldiring!");
-                return;
-            }
-
-            try {
-                const response = await fetch('/api/create-bot', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, templateId: selectedTemplateId, token, botAdminId })
-                });
-
-                const data = await response.json();
-                if (response.ok) {
-                    alert("Tabriklaymiz! Botingiz yuklandi va muvaffaqiyatli ishga tushirildi.");
-                    initApp();
-                    switchTab('bots');
-                } else {
-                    alert(data.error);
-                }
-            } catch (err) {
-                alert("Server xatosi!");
-            }
-        }
-
-        // ADMIN FUNKSIYALARI
-        async function changeBalance(action) {
-            const targetUserId = document.getElementById('adm-user-id').value.trim();
-            const amount = document.getElementById('adm-amount').value.trim();
-
-            if(!targetUserId || !amount) return alert("Hamma maydonlarni kiriting!");
-
-            const res = await fetch('/api/admin/change-balance', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adminId: userId, targetUserId, amount, action })
-            });
-            if (res.ok) {
-                alert("Muvaffaqiyatli bajarildi!");
-                initApp();
-            } else {
-                const err = await res.json();
-                alert(err.error);
-            }
-        }
-
-        // PHP SHABLONINI YUKLASH FUNKSIYASI
-        async function addBotTemplate() {
-            const name = document.getElementById('adm-bot-name').value.trim();
-            const price = document.getElementById('adm-bot-price').value.trim();
-            const daily = document.getElementById('adm-bot-daily').value.trim();
-            const desc = document.getElementById('adm-bot-desc').value.trim();
-            const fileInput = document.getElementById('adm-bot-file');
-
-            if(!name || !price || !daily || !desc || !fileInput.files[0]) {
-                return alert("Hamma ma'lumotlarni kiriting va PHP fayl yuklang!");
-            }
-
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-            
-            reader.onload = async function(e) {
-                const phpCode = e.target.result; // Fayl ichidagi kodni o'qish
-                
-                const res = await fetch('/api/admin/add-template', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ adminId: userId, name, price, daily, desc, phpCode })
-                });
-
-                if (res.ok) {
-                    alert("Yangi PHP shablon kodi bilan muvaffaqiyatli yuklandi!");
-                    document.getElementById('adm-bot-name').value = '';
-                    document.getElementById('adm-bot-price').value = '';
-                    document.getElementById('adm-bot-daily').value = '';
-                    document.getElementById('adm-bot-desc').value = '';
-                    fileInput.value = '';
-                    initApp();
-                    switchTab('create');
-                } else {
-                    const err = await res.json();
-                    alert(err.error);
-                }
-            };
-            reader.readAsText(file);
-        }
-
-        async function sendBroadcast() {
-            const text = document.getElementById('adm-broadcast-text').value.trim();
-            if(!text) return alert("Matnni kiriting!");
-
-            const res = await fetch('/api/admin/broadcast', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adminId: userId, text })
-            });
-            const data = await res.json();
-            if (res.ok) {
-                alert(`Xabar jami ${data.count} nafar foydalanuvchiga yuborildi!`);
-                document.getElementById('adm-broadcast-text').value = '';
-            }
-        }
-
-        async function toggleMaintenance() {
-            const currentStatus = document.getElementById('maintenance-toggle-btn').innerText.includes('ON');
-            const res = await fetch('/api/admin/maintenance', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adminId: userId, status: currentStatus })
-            });
-            if (res.ok) {
-                alert("Rejim yangilandi!");
-                initApp();
-            }
-        }
-
-        switchTab('home');
-    </script>
+      });
+    }
+  </script>
 </body>
-    </html>
-    
-    
+</html>
+
     
