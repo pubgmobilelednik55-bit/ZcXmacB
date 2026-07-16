@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ZcMeker WebApp</title>
-    <!-- Tailwind CSS va FontAwesome Ikonkalari -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
@@ -69,7 +68,6 @@
 </head>
 <body class="pb-28">
 
-    <!-- 3 SONIYALIK YUKLANISH EKRANI (LOADER) -->
     <div id="loader-screen" class="fixed inset-0 bg-purpleBg flex flex-col items-center justify-center z-50 transition-opacity duration-500">
         <div class="relative flex items-center justify-center mb-6">
             <div class="w-20 h-20 rounded-full border-4 border-purplePrimary/20 border-t-purpleAccent animate-spin"></div>
@@ -77,9 +75,7 @@
         </div>
         <h2 class="text-xl font-bold text-white tracking-widest animate-pulse mb-1">ZcMeker Bot</h2>
         <p class="text-xs text-gray-400">Yuklanmoqda...</p>
-          </div>
-              <!-- SARLAVHA (HEADER) -->
-    <header class="bg-purpleCard p-4 flex justify-between items-center border-b border-purplePrimary/30 shadow-lg sticky top-0 z-40">
+    </div>    <header class="bg-purpleCard p-4 flex justify-between items-center border-b border-purplePrimary/30 shadow-lg sticky top-0 z-40">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-robot text-purpleAccent text-xl"></i>
             <span class="font-bold text-lg text-purpleAccent">@ZcMekerBot</span>
@@ -90,17 +86,14 @@
         </div>
     </header>
 
-    <!-- TA'MIRLASH EKRANI (MAINTENANCE) -->
     <div id="maintenance-screen" class="hidden flex flex-col items-center justify-center min-h-[70vh] text-center p-6 animate-scale-up">
         <i class="fa-solid fa-screwdriver-wrench text-6xl text-purpleAccent mb-4 animate-bounce"></i>
         <h2 class="text-2xl font-bold mb-2">Tizim ta'mirlanmoqda</h2>
         <p class="text-gray-400 text-sm">Tez orada bot yana o'z faoliyatini tiklaydi. Sabr qilganingiz uchun rahmat!</p>
     </div>
 
-    <!-- ASOSIY KONTENT -->
     <main id="main-content" class="p-4 space-y-6 hidden">
 
-        <!-- BOSH SAHIFA -->
         <section id="sec-home" class="tab-section space-y-4">
             <div class="bg-purpleCard p-6 rounded-2xl border border-purplePrimary/20 text-center relative overflow-hidden shadow-2xl">
                 <div class="absolute -right-10 -top-10 w-32 h-32 bg-purplePrimary/20 rounded-full blur-xl"></div>
@@ -133,7 +126,6 @@
             </div>
         </section>
 
-        <!-- BOTLARIM SAHIFASI -->
         <section id="sec-bots" class="tab-section hidden space-y-4">
             <h2 class="text-md font-bold flex items-center space-x-2 text-purpleAccent">
                 <i class="fa-solid fa-server"></i>
@@ -144,7 +136,6 @@
             </div>
         </section>
 
-        <!-- YARATISH SAHIFASI -->
         <section id="sec-create" class="tab-section hidden space-y-4">
             <h2 class="text-md font-bold flex items-center space-x-2 text-purpleAccent">
                 <i class="fa-solid fa-wand-magic-sparkles"></i>
@@ -152,7 +143,6 @@
             </h2>
             <div class="grid grid-cols-1 gap-4" id="templates-container"></div>
 
-            <!-- Bot Yaratish Formasi -->
             <div id="creation-form" class="hidden bg-purpleCard p-5 rounded-2xl border border-purplePrimary/40 space-y-4 animate-scale-up">
                 <div class="flex justify-between items-center">
                     <h3 id="selected-bot-title" class="font-bold text-md text-purpleAccent">Bot</h3>
@@ -175,10 +165,7 @@
                     <i class="fa-solid fa-cube"></i>
                 </button>
             </div>
-        </section>
-
-        <!-- QO'LLANMA SAHIFASI -->
-        <section id="sec-guide" class="tab-section hidden space-y-4">
+                        </section>        <section id="sec-guide" class="tab-section hidden space-y-4">
             <div class="bg-purpleCard p-5 rounded-2xl border border-purplePrimary/20 space-y-4">
                 <h2 class="text-md font-bold text-purpleAccent flex items-center space-x-2">
                     <i class="fa-solid fa-circle-question"></i>
@@ -193,7 +180,6 @@
             </div>
         </section>
 
-        <!-- AKKAUNT SAHIFASI -->
         <section id="sec-account" class="tab-section hidden space-y-4">
             <div class="bg-purpleCard p-5 rounded-2xl border border-purplePrimary/20 text-center shadow-lg">
                 <div class="w-14 h-14 bg-purplePrimary/30 rounded-full mx-auto flex items-center justify-center mb-3 border border-purplePrimary/50">
@@ -221,52 +207,49 @@
                 </div>
 
                 <div class="mt-6 space-y-3">
-                    <button onclick="openDepositModal()" class="w-full bg-purplePrimary active:scale-95 py-3.5 rounded-xl font-bold text-sm flex justify-center items-center space-x-2 shadow-md transition-all">
+                    <a href="https://t.me/CDXmc" target="_blank" class="w-full bg-purplePrimary active:scale-95 py-3.5 rounded-xl font-bold text-sm flex justify-center items-center space-x-2 shadow-md transition-all">
                         <i class="fa-solid fa-circle-plus"></i>
                         <span>Hisobni to'ldirish</span>
-                    </button>
+                    </a>
                     <div class="pt-4 border-t border-purplePrimary/20 flex justify-between items-center text-[10px] text-gray-400">
                         <span>Loyiha: <strong class="text-purpleAccent">@ZcMekerBot</strong></span>
-                        <a href="https://t.me/ZcCoder" target="_blank" class="hover:underline flex items-center space-x-1">
+                        <a href="https://t.me/CDXmc" target="_blank" class="hover:underline flex items-center space-x-1">
                             <i class="fa-solid fa-user-shield text-purpleAccent"></i>
-                            <span>Admin: @ZcCoder</span>
+                            <span>Admin: @CDXmc</span>
                         </a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- HISOBNI TO'LDIRISH MODALI -->
-        <div id="deposit-modal" class="hidden bg-purpleCard p-5 rounded-2xl border border-purplePrimary/40 space-y-4 animate-scale-up">
-            <div class="flex justify-between items-center">
-                <h3 class="font-bold text-md text-purpleAccent">Hisobni to'ldirish</h3>
-                <button onclick="closeDepositModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-times text-lg"></i></button>
+        <section id="sec-admin-auth" class="tab-section hidden space-y-4">
+            <div class="bg-purpleCard p-6 rounded-2xl border border-purplePrimary/30 text-center space-y-4">
+                <i class="fa-solid fa-lock text-5xl text-purpleAccent animate-bounce"></i>
+                <h2 class="text-lg font-bold">Admin Panelga kirish</h2>
+                <p class="text-xs text-gray-400">Xavfsizlik yuzasidan parolingizni kiriting:</p>
+                <input type="password" id="admin-pass-input" placeholder="Parol (CDXMC)" class="w-full bg-purpleBg border border-purplePrimary/30 rounded-xl p-3.5 text-center text-sm focus:outline-none focus:border-purpleAccent tracking-widest font-bold">
+                <button onclick="verifyAdminPassword()" class="w-full bg-purplePrimary py-3.5 rounded-xl font-bold text-xs transition-all active:scale-95">Kirishni tasdiqlash</button>
             </div>
-            <div class="text-xs bg-purpleBg p-4 rounded-xl space-y-3">
-                <p class="text-gray-300">Pullarni quyidagi karta raqamiga yuboring:</p>
-                <div class="flex justify-between items-center bg-purpleCard p-3 rounded-lg border border-purplePrimary/30">
-                    <span id="card-num" class="font-mono text-purpleAccent font-bold">4916990355543858</span>
-                    <button onclick="copyCard()" class="text-gray-400 hover:text-white transition-all"><i class="fa-solid fa-copy"></i></button>
-                </div>
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-400">Karta egasi:</span>
-                    <span class="font-bold text-white text-right">Sharifaxon Xodjimova</span>
-                </div>
-                <p class="text-[10px] text-yellow-400"><i class="fa-solid fa-triangle-exclamation"></i> To'lovni amalga oshirgach, chekni va o'z ID-ingizni adminga jo'nating!</p>
-            </div>
-            <a href="https://t.me/ZcCoder" target="_blank" class="w-full block text-center bg-purplePrimary py-3.5 rounded-xl font-bold text-sm transition-all active:scale-95">
-                <i class="fa-solid fa-paper-plane mr-2"></i>Adminga chek yuborish
-            </a>
-        </div>
+        </section>
 
-        <!-- ADMIN PANEL -->
         <section id="sec-admin" class="tab-section hidden space-y-4">
             <div class="bg-purpleCard p-5 rounded-2xl border border-purplePrimary/30 space-y-4">
                 <h2 class="text-md font-bold text-purpleAccent flex items-center space-x-2">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <span>ZcMeker Admin Boshqaruvi</span>
+                    <i class="fa-solid fa-shield-halved animate-pulse"></i>
+                    <span>CDXMC Admin Boshqaruvi</span>
                 </h2>
-                
+
+                <div class="grid grid-cols-2 gap-3 bg-purpleBg p-3.5 rounded-xl border border-purplePrimary/10">
+                    <div class="text-center p-2">
+                        <div id="stat-total-users" class="font-bold text-lg text-purpleAccent">0</div>
+                        <div class="text-[9px] text-gray-400">Jami Foydalanuvchilar</div>
+                    </div>
+                    <div class="text-center p-2">
+                        <div id="stat-total-bots" class="font-bold text-lg text-green-400">0</div>
+                        <div class="text-[9px] text-gray-400">Jami Yaratilgan Botlar</div>
+                    </div>
+                </div>
+
                 <div class="bg-purpleBg p-3.5 rounded-xl space-y-3">
                     <h4 class="font-semibold text-xs text-purpleAccent">Foydalanuvchi balansini tahrirlash</h4>
                     <input type="text" id="adm-user-id" placeholder="Foydalanuvchi telegram ID raqami" class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none">
@@ -277,13 +260,37 @@
                     </div>
                 </div>
 
-                <div class="bg-purpleBg p-3.5 rounded-xl space-y-2">
-                    <h4 class="font-semibold text-xs text-purpleAccent">Yangi PHP Bot shabloni qo'shish</h4>
-                    <input type="text" id="adm-bot-name" placeholder="Bot nomi (masalan: SMM)" class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none">
+                <div class="bg-purpleBg p-3.5 rounded-xl space-y-3">
+                    <h4 class="font-semibold text-xs text-purpleAccent">Yangi PHP Bot shabloni yuklash</h4>
+                    <input type="text" id="adm-bot-name" placeholder="Bot nomi (SMM Bot, Konstruktor...)" class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none">
                     <input type="number" id="adm-bot-price" placeholder="Yaratish narxi (so'm)" class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none">
                     <input type="number" id="adm-bot-daily" placeholder="Kunlik xizmat to'lovi (so'm)" class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none">
-                    <textarea id="adm-bot-desc" placeholder="Shablon haqida ma'lumot kiriting..." class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none h-14"></textarea>
-                    <button onclick="addBotTemplate()" class="w-full bg-purplePrimary py-3 rounded-lg text-xs font-bold active:scale-95 transition-all">Yangi bot shablonini qo'shish</button>
+                    <textarea id="adm-bot-desc" placeholder="Shablon haqida batafsil tavsif kiriting..." class="w-full bg-purpleCard border border-purplePrimary/30 rounded-lg p-3 text-xs focus:outline-none h-14"></textarea>
+                    
+                    <div>
+                        <label class="block text-[10px] text-gray-400 mb-1"><i class="fa-solid fa-file-code"></i> PHP faylni yuklang:</label>
+                        <input type="file" id="adm-bot-file" accept=".php" class="w-full text-xs text-gray-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:bg-purpleCard file:text-purpleAccent file:font-semibold">
+                    </div>
+
+                    <button onclick="addBotTemplate()" class="w-full bg-purplePrimary py-3 rounded-lg text-xs font-bold active:scale-95 transition-all">PHP Shabloni va Faylni Qo'shish</button>
+                </div>
+
+                <div class="bg-purpleBg p-3.5 rounded-xl space-y-2">
+                    <h4 class="font-semibold text-xs text-purpleAccent"><i class="fa-solid fa-users"></i> Foydalanuvchilar Ro'yxati</h4>
+                    <div class="overflow-x-auto max-h-48 rounded-lg border border-purplePrimary/20">
+                        <table class="w-full text-left text-[10px] text-gray-300">
+                            <thead class="bg-purpleCard text-purpleAccent uppercase">
+                                <tr>
+                                    <th class="p-2 border-b border-purplePrimary/20">ID</th>
+                                    <th class="p-2 border-b border-purplePrimary/20">Username</th>
+                                    <th class="p-2 border-b border-purplePrimary/20">Balans</th>
+                                    <th class="p-2 border-b border-purplePrimary/20">Sana</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-table-body">
+                                </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <div class="bg-purpleBg p-3.5 rounded-xl space-y-2">
@@ -299,9 +306,8 @@
             </div>
         </section>
 
-                  </main>
-      <!-- KATTA VA QULAY NAVIGATSIYA MENYUSI (PAPKASIZ STRUKTURA) -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-purpleCard/95 backdrop-blur-md border-t border-purplePrimary/30 py-4.5 flex justify-around items-center z-50 shadow-[0_-5px_25px_rgba(0,0,0,0.6)]">
+                        </main>
+                                                            <nav class="fixed bottom-0 left-0 right-0 bg-purpleCard/95 backdrop-blur-md border-t border-purplePrimary/30 py-4.5 flex justify-around items-center z-50 shadow-[0_-5px_25px_rgba(0,0,0,0.6)]">
         <button onclick="switchTab('home')" class="flex flex-col items-center space-y-2 text-gray-400 hover:text-purpleAccent transition-all duration-300 active:scale-90" id="nav-home">
             <i class="fa-solid fa-house text-xl"></i>
             <span class="text-[11px] font-semibold tracking-wide">Bosh sahifa</span>
@@ -324,13 +330,13 @@
         </button>
     </nav>
 
-    <!-- JS MANTIQLARI -->
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get('userId') || 8683151446;
+        const userId = urlParams.get('userId') || 8379904990; // Admin ID: 8379904990
 
         let currentUser = null;
         let templates = [];
+        let isAdminAuthenticated = false;
 
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(async () => {
@@ -345,7 +351,7 @@
                     mainContent.classList.remove('hidden');
                     mainContent.classList.add('animate-fade-in');
                 }, 500);
-            }, 3000); // 3 soniyalik qat'iy yuklanish jarayoni
+            }, 3000);
         });
 
         async function initApp() {
@@ -356,7 +362,7 @@
                 currentUser = data.user;
                 templates = data.templates;
 
-                if (data.system.isMaintenance && parseInt(userId) !== 8683151446) {
+                if (data.system.isMaintenance && parseInt(userId) !== 8379904990) {
                     document.getElementById('main-content').classList.add('hidden');
                     document.getElementById('maintenance-screen').classList.remove('hidden');
                     return;
@@ -372,6 +378,7 @@
                 document.getElementById('acc-balance').innerText = currentUser.balance.toLocaleString() + ' so\'m';
                 document.getElementById('acc-deposited').innerText = currentUser.deposited.toLocaleString() + ' so\'m';
 
+                // Botlarim ro'yxati
                 const userBotsContainer = document.getElementById('user-bots-list');
                 if (currentUser.createdBots.length > 0) {
                     userBotsContainer.innerHTML = '';
@@ -390,6 +397,7 @@
                     userBotsContainer.innerHTML = '<p class="text-center text-gray-400 py-6 text-xs">Sizda hali yaratilgan botlar mavjud emas.</p>';
                 }
 
+                // Shablonlar ro'yxati
                 const templatesContainer = document.getElementById('templates-container');
                 templatesContainer.innerHTML = '';
                 if (templates.length > 0) {
@@ -409,19 +417,39 @@
                         `;
                     });
                 } else {
-                    templatesContainer.innerHTML = '<p class="text-center text-gray-400 py-6 text-xs">Hozircha hech qanday bot shabloni mavjud emas. Admin tomonidan tez orada qo\'shiladi.</p>';
+                    templatesContainer.innerHTML = '<p class="text-center text-gray-400 py-6 text-xs">Hozircha hech qanday bot shabloni mavjud emas.</p>';
                 }
 
-                if (parseInt(userId) === 8683151446) {
+                // ADMIN ID TEKSHIRISH (Faqat 8379904990)
+                if (parseInt(userId) === 8379904990) {
                     const nav = document.querySelector('nav');
                     if (!document.getElementById('nav-admin')) {
                         nav.innerHTML += `
-                            <button onclick="switchTab('admin')" class="flex flex-col items-center space-y-2 text-gray-400 hover:text-purpleAccent transition-all duration-300 active:scale-90" id="nav-admin">
+                            <button onclick="clickAdminTab()" class="flex flex-col items-center space-y-2 text-gray-400 hover:text-purpleAccent transition-all duration-300 active:scale-90" id="nav-admin">
                                 <i class="fa-solid fa-lock text-xl text-purpleAccent animate-bounce"></i>
                                 <span class="text-[11px] font-semibold tracking-wide">Admin</span>
                             </button>
                         `;
                     }
+
+                    // Statisika yuklash
+                    document.getElementById('stat-total-users').innerText = data.totalUsers;
+                    document.getElementById('stat-total-bots').innerText = data.system.createdBotsCount;
+
+                    // Foydalanuvchilar jadvali
+                    const userTable = document.getElementById('admin-users-table-body');
+                    userTable.innerHTML = '';
+                    data.allUsers.forEach(u => {
+                        userTable.innerHTML += `
+                            <tr class="border-b border-purplePrimary/10">
+                                <td class="p-2 font-mono">${u.id}</td>
+                                <td class="p-2 text-purpleAccent">${u.username}</td>
+                                <td class="p-2 text-green-400">${u.balance.toLocaleString()} so'm</td>
+                                <td class="p-2 text-gray-400">${u.regDate || '-'}</td>
+                            </tr>
+                        `;
+                    });
+
                     if (data.system.isMaintenance) {
                         document.getElementById('maintenance-toggle-btn').innerText = "Bot: OFF (Ta'mirda)";
                         document.getElementById('maintenance-toggle-btn').className = "bg-red-600 px-5 py-2.5 rounded-lg text-xs font-bold";
@@ -436,8 +464,37 @@
             }
         }
 
+        function clickAdminTab() {
+            if (isAdminAuthenticated) {
+                switchTab('admin');
+            } else {
+                switchTab('admin-auth');
+            }
+        }
+
+        async function verifyAdminPassword() {
+            const password = document.getElementById('admin-pass-input').value.trim();
+            try {
+                const res = await fetch('/api/admin/verify-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminId: userId, password })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    isAdminAuthenticated = true;
+                    alert("Tizimga muvaffaqiyatli kirildi!");
+                    switchTab('admin');
+                } else {
+                    alert(data.error);
+                }
+            } catch (err) {
+                alert("Serverga ulanishda xatolik!");
+            }
+        }
+
         function switchTab(tabId) {
-            const sections = ['sec-home', 'sec-bots', 'sec-create', 'sec-guide', 'sec-account', 'sec-admin'];
+            const sections = ['sec-home', 'sec-bots', 'sec-create', 'sec-guide', 'sec-account', 'sec-admin-auth', 'sec-admin'];
             sections.forEach(sec => {
                 const el = document.getElementById(sec);
                 if (el) el.classList.add('hidden');
@@ -449,14 +506,16 @@
                 const el = document.getElementById(nav);
                 if (el) el.classList.remove('nav-active');
             });
-            const activeNav = document.getElementById(`nav-${tabId}`);
+            
+            let activeTabId = tabId === 'admin-auth' ? 'admin' : tabId;
+            const activeNav = document.getElementById(`nav-${activeTabId}`);
             if (activeNav) activeNav.classList.add('nav-active');
         }
 
         function shareReferral() {
             const refLink = `https://t.me/ZcMekerBot?start=${userId}`;
             navigator.clipboard.writeText(refLink);
-            alert("Sizning referal havolangiz nusxalandi! Uni do'stlaringizga ulashing.");
+            alert("Referal havolangiz nusxalandi!");
         }
 
         let selectedTemplateId = null;
@@ -480,7 +539,7 @@
             const botAdminId = document.getElementById('bot-adminid-input').value.trim();
 
             if (!token || !botAdminId) {
-                alert("Iltimos barcha maydonlarni to'ldiring!");
+                alert("Hamma ma'lumotlarni to'ldiring!");
                 return;
             }
 
@@ -493,36 +552,23 @@
 
                 const data = await response.json();
                 if (response.ok) {
-                    alert("Tabriklaymiz! Botingiz muvaffaqiyatli ishga tushirildi.");
+                    alert("Tabriklaymiz! Botingiz yuklandi va muvaffaqiyatli ishga tushirildi.");
                     initApp();
                     switchTab('bots');
                 } else {
                     alert(data.error);
                 }
             } catch (err) {
-                alert("Ulanish xatosi!");
+                alert("Server xatosi!");
             }
         }
 
-        function openDepositModal() {
-            document.getElementById('deposit-modal').classList.remove('hidden');
-        }
-
-        function closeDepositModal() {
-            document.getElementById('deposit-modal').classList.add('hidden');
-        }
-
-        function copyCard() {
-            const cardNum = document.getElementById('card-num').innerText;
-            navigator.clipboard.writeText(cardNum);
-            alert("Karta raqami nusxalandi!");
-        }
-
+        // ADMIN FUNKSIYALARI
         async function changeBalance(action) {
             const targetUserId = document.getElementById('adm-user-id').value.trim();
             const amount = document.getElementById('adm-amount').value.trim();
 
-            if(!targetUserId || !amount) return alert("Hamma maydonlarni to'ldiring");
+            if(!targetUserId || !amount) return alert("Hamma maydonlarni kiriting!");
 
             const res = await fetch('/api/admin/change-balance', {
                 method: 'POST',
@@ -530,7 +576,7 @@
                 body: JSON.stringify({ adminId: userId, targetUserId, amount, action })
             });
             if (res.ok) {
-                alert("Balans muvaffaqiyatli yangilandi!");
+                alert("Muvaffaqiyatli bajarildi!");
                 initApp();
             } else {
                 const err = await res.json();
@@ -538,33 +584,50 @@
             }
         }
 
+        // PHP SHABLONINI YUKLASH FUNKSIYASI
         async function addBotTemplate() {
             const name = document.getElementById('adm-bot-name').value.trim();
             const price = document.getElementById('adm-bot-price').value.trim();
             const daily = document.getElementById('adm-bot-daily').value.trim();
             const desc = document.getElementById('adm-bot-desc').value.trim();
+            const fileInput = document.getElementById('adm-bot-file');
 
-            if(!name || !price || !daily || !desc) return alert("Ma'lumotlarni kiriting!");
-
-            const res = await fetch('/api/admin/add-template', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ adminId: userId, name, price, daily, desc })
-            });
-            if (res.ok) {
-                alert("Yangi bot shabloni muvaffaqiyatli qo'shildi!");
-                document.getElementById('adm-bot-name').value = '';
-                document.getElementById('adm-bot-price').value = '';
-                document.getElementById('adm-bot-daily').value = '';
-                document.getElementById('adm-bot-desc').value = '';
-                initApp();
-                switchTab('create');
+            if(!name || !price || !daily || !desc || !fileInput.files[0]) {
+                return alert("Hamma ma'lumotlarni kiriting va PHP fayl yuklang!");
             }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = async function(e) {
+                const phpCode = e.target.result; // Fayl ichidagi kodni o'qish
+                
+                const res = await fetch('/api/admin/add-template', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ adminId: userId, name, price, daily, desc, phpCode })
+                });
+
+                if (res.ok) {
+                    alert("Yangi PHP shablon kodi bilan muvaffaqiyatli yuklandi!");
+                    document.getElementById('adm-bot-name').value = '';
+                    document.getElementById('adm-bot-price').value = '';
+                    document.getElementById('adm-bot-daily').value = '';
+                    document.getElementById('adm-bot-desc').value = '';
+                    fileInput.value = '';
+                    initApp();
+                    switchTab('create');
+                } else {
+                    const err = await res.json();
+                    alert(err.error);
+                }
+            };
+            reader.readAsText(file);
         }
 
         async function sendBroadcast() {
             const text = document.getElementById('adm-broadcast-text').value.trim();
-            if(!text) return alert("Xabarni yozing!");
+            if(!text) return alert("Matnni kiriting!");
 
             const res = await fetch('/api/admin/broadcast', {
                 method: 'POST',
@@ -586,7 +649,7 @@
                 body: JSON.stringify({ adminId: userId, status: currentStatus })
             });
             if (res.ok) {
-                alert("Rejim o'zgartirildi!");
+                alert("Rejim yangilandi!");
                 initApp();
             }
         }
@@ -594,5 +657,7 @@
         switchTab('home');
     </script>
 </body>
-              </html>
-  
+    </html>
+    
+    
+    
